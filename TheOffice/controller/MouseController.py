@@ -54,13 +54,14 @@ class MouseController:
             for element in self.interface_service.element_list:
                 if self.cursor.collides_with(element.rect):
                     element.click()
-            if self.interface_service.purchased_room != RoomType.NONE:
-                self.cursor.set_cursor_object(self.interface_service.purchased_room)
-                self.interface_service.purchased_room = RoomType.NONE
             if self.interface_service.purchased_room == RoomType.NEW_FLOOR:
                 self.building_controller.build_floor()
                 self.interface_service.purchased_room = RoomType.NONE
                 return
+            if self.interface_service.purchased_room != RoomType.NONE:
+                self.cursor.set_cursor_object(self.interface_service.purchased_room)
+                self.interface_service.purchased_room = RoomType.NONE
+
         self.hover_event()
 
     def hover_event(self):

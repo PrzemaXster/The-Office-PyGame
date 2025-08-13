@@ -14,7 +14,7 @@ from service.RoomType import RoomType
 
 class InterfaceService:
     def __init__(self, company):
-        self._time_dist = 1800
+        self._time_dist = 900
         self._timestamp = time.get_ticks()
         self.calendar_element = CalendarElement(Rect(250, 170, 283, 192),
                                                 image.load("../resources/interface/elements/calendar/calendar.png"))
@@ -23,7 +23,7 @@ class InterfaceService:
         self.hire_element = HireElement(Rect(290, 200, 60, 140), image.load("../resources/employees/male/emp1/employee.png"), company)
         self.statistics_element = StatisticsElement(Rect(250, 170, 283, 192),
                                                     image.load("../resources/interface/elements/statistics/game_stats.png"), company)
-        self.emp_stat_element = EmployeeStatElement(Rect(0,0,0,0), None)
+        self.emp_stat_element = EmployeeStatElement(Rect(0, 0, 0, 0), None)
 
         self.arrow_right_element = InterfaceElement(Rect(570, 170, 100, 170), image.load("../resources/interface/elements/right.png"),
                                                     self.switch_view_right, self.drop_shadow)
@@ -62,6 +62,9 @@ class InterfaceService:
             self.clock_element.update_clock(theta)
             if self.clock_element.progress == 99:
                 self.calendar_element.update()
+                if self.calendar_element.current_date.day % 7:
+                    self.click_reject()
+                    self.hire_element.generate_candidates()
             self._timestamp = time.get_ticks()
 
     def get_clock_progress_str(self):
@@ -95,7 +98,8 @@ class InterfaceService:
             else:
                 return
         elif self.view_type == self.HIRE_EMPLOYEE:
-            self.hired_emp = self.hire_element.get_selected_emp()
+            self.hired_emp = self.hire_element.hire_selected_emp()
+            self.hire_element.reset_selection()
         self.view_type = self.NO_TYPE
 
     def click_reject(self):
