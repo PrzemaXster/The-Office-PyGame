@@ -14,6 +14,8 @@ class TaskService:
             self.task_thread.insert_emp_stress(emp)
         elif type == "motivation":
             self.task_thread.insert_emp_motivation(emp)
+        elif type == "bladder":
+            self.task_thread.insert_emp_bladder(emp)
 
     def pop_emp(self, emp, type):
         if type == "work":
@@ -24,6 +26,8 @@ class TaskService:
             self.task_thread.pop_emp_stress(emp)
         elif type == "motivation":
             self.task_thread.pop_emp_motivation(emp)
+        elif type == "bladder":
+            self.task_thread.pop_emp_bladder(emp)
 
 
 

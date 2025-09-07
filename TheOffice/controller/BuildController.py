@@ -16,6 +16,8 @@ class BuildingController:
             self.building_service.build_game_room(board_pos)
         elif room_type == RoomType.CONFERENCE_ROOM:
             self.building_service.build_conference_room(board_pos)
+        elif room_type == RoomType.TOILET:
+            self.building_service.build_toilet(board_pos)
         elif room_type == RoomType.CORRIDOR:
             self.building_service.build_corridor(board_pos)
         elif room_type == RoomType.ELEVATOR:

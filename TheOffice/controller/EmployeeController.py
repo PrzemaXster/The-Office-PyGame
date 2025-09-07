@@ -4,12 +4,17 @@ import random
 import pygame
 
 from model.Company import Company
+from service.EmployeeServices.EmployeeManagement.AnimationService import AnimationService
 from service.EmployeeServices.EmployeeManagement.EmployeeManagementService import EmployeeManagementService
 from service.Interface.InterfaceService import InterfaceService
 
 
 class EmployeeController:
-    def __init__(self, room_board, ground, company: Company, interface_service: InterfaceService):
+    def __init__(self, room_board, ground, company: Company, interface_service: InterfaceService,
+                 animation_service: AnimationService):
+        self.animation_service = animation_service
+        self.interface_service = interface_service
+        self.company = company
         self.employee_names = [
             "George",
             "Michael",
@@ -23,9 +28,7 @@ class EmployeeController:
             "Howard",
             "Harry"
         ]
-        self.employee_service = EmployeeManagementService(room_board, ground)
-        self.interface_service = interface_service
-        self.company = company
+        self.employee_service = EmployeeManagementService(room_board, ground, self.animation_service)
 
     def manage_salaries(self):
         if self.interface_service.calendar_element.is_payday():
@@ -34,7 +37,9 @@ class EmployeeController:
             self.employee_service.reset_payment_system()
 
     def create_employee(self, x, y):
-        self.employee_service.create_employee(x, y, self.employee_names[random.randint(0, len(self.employee_names) - 1)], self.company)
+        self.employee_service.create_employee(x, y,
+                                              self.employee_names[random.randint(0, len(self.employee_names) - 1)],
+                                              self.company)
 
     def grab_employee_event(self, event):
         for i in range(0, len(self.employee_service.employee_list)):
