@@ -82,6 +82,9 @@ class DestinationSearchService:
             elif type(emp.destination).__name__ == "GameSpot":
                 self.task_service_t.insert_emp(emp, "stress")
                 emp.coord = (emp.destination.room.place_index, emp.destination.room.floor)
+            elif type(emp.destination).__name__ == "ToiletSeat":
+                self.task_service_t.insert_emp(emp, "bladder")
+                emp.coord = (emp.destination.room.place_index, emp.destination.room.floor)
             elif type(emp.destination).__name__ == "Elevator":
                 self.change_destination(emp, emp.destination_mem)
                 self.teleport_to_floor(emp, emp.destination)

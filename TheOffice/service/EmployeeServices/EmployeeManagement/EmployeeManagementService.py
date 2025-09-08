@@ -37,26 +37,29 @@ class EmployeeManagementService:
                 if emp.is_not_fulfilling_needs() or (emp.is_relaxed() and emp.is_satiated()):
                     self.task_service_t.pop_emp(emp, "motivation")
                     self.task_service_t.pop_emp(emp, "work")
+                    self.task_service_t.pop_emp(emp, "stress")
                     self.task_service_t.pop_emp(emp, "hunger")
-                    self.task_service_t.pop_emp(emp, "bladder")
                     self.dest_service.search_for_room(emp, "Toilet")
             elif emp.is_hungry():
                 if emp.is_not_fulfilling_needs() or (emp.is_relaxed() and emp.is_full_bladder()):
                     self.task_service_t.pop_emp(emp, "work")
                     self.task_service_t.pop_emp(emp, "stress")
                     self.task_service_t.pop_emp(emp, "motivation")
+                    self.task_service_t.pop_emp(emp, "bladder")
                     self.dest_service.search_for_room(emp, "DiningRoom")
             elif emp.is_stressed():
                 if emp.is_not_fulfilling_needs() or (emp.is_satiated() and emp.is_full_bladder()):
                     self.task_service_t.pop_emp(emp, "motivation")
                     self.task_service_t.pop_emp(emp, "work")
                     self.task_service_t.pop_emp(emp, "hunger")
+                    self.task_service_t.pop_emp(emp, "bladder")
                     self.dest_service.search_for_room(emp, "GameRoom")
             # when employee just stands on ground
             elif emp.is_idle():
                 self.task_service_t.pop_emp(emp, "stress")
                 self.task_service_t.pop_emp(emp, "motivation")
                 self.task_service_t.pop_emp(emp, "hunger")
+                self.task_service_t.pop_emp(emp, "bladder")
                 self.dest_service.search_for_room(emp, "OfficeRoom")
         # movement logic towards destination
         if emp.destination is not None and not emp.is_collide_with_mouse() and self.ground.is_touching_adjusted(emp) and not emp.block_move:

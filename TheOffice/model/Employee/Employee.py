@@ -155,7 +155,7 @@ class Employee(sprite.Sprite):
 
     def is_idle(self):
         return self.destination is None and not (
-                    self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting())
+                    self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting() or self.is_peeing())
 
     def is_working(self):
         return type(self.assigned_furniture).__name__ == "OfficeDesk"
@@ -170,7 +170,7 @@ class Employee(sprite.Sprite):
         return type(self.assigned_furniture).__name__ == "ConferenceChair" and not self.is_motivated()
 
     def is_peeing(self):
-        return type(self.assigned_furniture).__name__ == "Toilet" and not self.is_full_bladder()
+        return type(self.assigned_furniture).__name__ == "ToiletSeat" and not self.is_full_bladder()
 
     def is_satiated(self):
         return self.needs.hunger > 99
@@ -182,7 +182,7 @@ class Employee(sprite.Sprite):
         return self.needs.motivation > 99
 
     def is_full_bladder(self):
-        return self.needs.bladder <= 99
+        return self.needs.bladder > 99
 
     def is_hungry(self):
         return self.needs.hunger <= self._abilities.stomach
@@ -191,7 +191,7 @@ class Employee(sprite.Sprite):
         return self.needs.stress <= self._abilities.anxiety
 
     def is_empty_bladder(self):
-        return self.needs.bladder <= 0
+        return self.needs.bladder <= 10
 
     def is_unmotivated(self):
         return self.needs.motivation <= self._abilities.boredom

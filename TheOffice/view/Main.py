@@ -110,8 +110,7 @@ class Game:
                              self.interface_service.emp_stat_element.rect.move(10, 50))
             self.screen.blit(self.interface_service.emp_stat_element.motivation_text,
                              self.interface_service.emp_stat_element.rect.move(10, 70))
-            self.screen.blit(self.interface_service.emp_stat_element.sales_text,
-                             self.interface_service.emp_stat_element.rect.move(10, 90))
+
             self.screen.blit(self.interface_service.emp_stat_element.emp_name_text,
                              self.interface_service.emp_stat_element.rect.move(110, 10))
             self.screen.blit(self.interface_service.emp_stat_element.hunger_bar,
@@ -120,8 +119,15 @@ class Game:
                              self.interface_service.emp_stat_element.rect.move(110, 55))
             self.screen.blit(self.interface_service.emp_stat_element.motivation_bar,
                              self.interface_service.emp_stat_element.rect.move(110, 75))
+            self.screen.blit(self.interface_service.emp_stat_element.bladder_text,
+                             self.interface_service.emp_stat_element.rect.move(10,90 ))
+            self.screen.blit(self.interface_service.emp_stat_element.bladder_bar,
+                             self.interface_service.emp_stat_element.rect.move(110, 90))
             self.screen.blit(self.interface_service.emp_stat_element.sales_number_text,
-                             self.interface_service.emp_stat_element.rect.move(120, 90))
+                             self.interface_service.emp_stat_element.rect.move(120, 110))
+            self.screen.blit(self.interface_service.emp_stat_element.sales_text,
+                             self.interface_service.emp_stat_element.rect.move(10, 110))
+
 
         # draw different views based on which icon user clicked
         if self.interface_service.view_type == self.interface_service.HIRE_EMPLOYEE:
@@ -208,8 +214,9 @@ class Game:
         self.first_room = self.building_controller.building_service.room_board[0][0]
 
         # self.employee_controller.create_employee(120, 280, "Bob2", self._company)
-        self.employee_controller.employee_service.employee_list[0].needs.hunger = 20
-        self.employee_controller.employee_service.employee_list[0].needs.stress = 20
+        # self.employee_controller.employee_service.employee_list[0].needs.hunger = 20
+        # self.employee_controller.employee_service.employee_list[0].needs.stress = 20
+        self.employee_controller.employee_service.employee_list[0].needs.bladder = 10
 
     def init_animations(self):
         self.speech_bubble_disagree = AnimationObject(Rect(30, 30, 40, 40), [pygame.image.load(

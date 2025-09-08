@@ -14,7 +14,7 @@ class EmployeeTaskThread(Thread):
         super().__init__()
 
     def empty_dict(self):
-        return len(self.work_dict) == 0 and len(self.hunger_dict) == 0 and len(self.stress_dict) == 0
+        return len(self.work_dict) == 0 and len(self.hunger_dict) == 0 and len(self.stress_dict) == 0 and len(self.motivation_dict) == 0 and len(self.bladder_dict) == 0
 
     def insert_emp_work(self, emp):
         self.work_dict[id(emp)] = emp

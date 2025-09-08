@@ -26,7 +26,7 @@ class Needs:
             self.motivation += self._abilities.boredom * 3
 
     def pee(self):
-        if self.bladder > 10:
+        if self.bladder <= 100:
             self.bladder += 30
 
     def decrease_motivation(self):
