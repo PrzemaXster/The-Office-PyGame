@@ -33,6 +33,10 @@ class ConversationService:
                     if not self.check_convo_phase(pair.conversation_timestamp, self.END_SPEAK):
                         pair.emp1.in_conversation = False
                         pair.emp2.in_conversation = False
+                        pair.emp1.needs.play()
+                        pair.emp1.needs.meet()
+                        pair.emp2.needs.play()
+                        pair.emp2.needs.meet()
                         self.conversation_pairs.remove(pair)
                 else:
                     pair.next_topic()
@@ -47,10 +51,14 @@ class ConversationService:
                 emp.vision_field.y = emp.rect.y
                 emp2.vision_field.x = emp2.rect.x - 50
                 emp2.vision_field.y = emp2.rect.y
-                if emp != emp2 and emp.is_emp_in_vision(emp2) and not emp.in_conversation and not emp2.in_conversation:
-                    conversation_chances = random.randrange(1, 1000)
+                if emp != emp2 and self.emps_are_passing_by(emp, emp2):
+                    conversation_chances = random.randrange(1, 200)
                     if conversation_chances == self.LETS_TALK:
                         self.initiate_conversation(emp, emp2)
+
+    def emps_are_passing_by(self, emp, emp2):
+        return emp.is_emp_in_vision(
+            emp2) and not (emp.in_conversation or emp2.in_conversation or emp2.is_active() or emp.is_active() or emp.is_in_need() or emp2.is_in_need())
 
     def initiate_conversation(self, emp: Employee, emp2: Employee):
         emp.in_conversation = True

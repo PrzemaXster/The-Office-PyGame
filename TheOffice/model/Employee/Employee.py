@@ -34,7 +34,6 @@ class Employee(sprite.Sprite):
         self.assigned_furniture = None
         self.block_move = False
 
-
     def init_sprite(self, x, y):
         self.WALK_LEFT = 0
         self.WALK_LEFT2 = 1
@@ -91,7 +90,7 @@ class Employee(sprite.Sprite):
         self.shake_images = [image.load(self.images_path + img_name) for img_name in shake_img_names]
         self.mask = mask.from_surface(self.image)
         self.rect = Rect(x, y, self.image.get_width(), self.image.get_height())
-        self.vision_field = Rect(x - 50, y, 100,5)
+        self.vision_field = Rect(x - 50, y, 100, 5)
 
     def set_desk(self, action_object: Furniture):
         self.assigned_furniture = action_object
@@ -153,9 +152,15 @@ class Employee(sprite.Sprite):
     def is_not_fulfilling_needs(self):
         return not self.is_eating() and not self.is_peeing() and not self.is_playing()
 
+    def is_active(self):
+        return self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting() or self.is_peeing()
+
+    def is_in_need(self):
+        return self.is_empty_bladder() or self.is_stressed() or self.is_hungry()
+
     def is_idle(self):
         return self.destination is None and not (
-                    self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting() or self.is_peeing())
+                self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting() or self.is_peeing())
 
     def is_working(self):
         return type(self.assigned_furniture).__name__ == "OfficeDesk"

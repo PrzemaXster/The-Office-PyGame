@@ -33,7 +33,7 @@ class DestinationSearchService:
 
     def search_rooms(self, emp, room_list, dest_room):
         # available room searching algorithm
-        room_dist = 1
+        room_dist = 0
         while True:
             # look for the closest destination room from employee
             room_on_right = emp.coord[0] + room_dist

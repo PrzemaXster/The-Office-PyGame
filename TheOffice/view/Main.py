@@ -82,8 +82,8 @@ class Game:
         for floor in range(0, len(self.building_controller.get_room_board())):
             for room in self.building_controller.get_room_board()[floor]:
                 self.screen.blit(room.image, room.rect)
-                for action_obj in room.action_objects:
-                    pygame.draw.rect(self.screen, (0, 0, 0), action_obj.rect)
+                # for action_obj in room.action_objects:
+                #     pygame.draw.rect(self.screen, (0, 0, 0), action_obj.rect)
         if self.mouse_controller.cursor.drags_room():
             self.screen.blit(self.mouse_controller.cursor.image, self.mouse_controller.cursor.rect.move(-150, -150))
         for emp in self.employee_controller.employee_service.employee_list:
