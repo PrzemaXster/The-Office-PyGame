@@ -2,6 +2,7 @@ from pygame import sprite, image, mask, mouse, Rect
 
 from model.Company import Company
 from model.Employee.Abilities import Abilities
+from model.Employee.Interests import Interests
 from model.Employee.Needs import Needs
 from model.Employee.SaleCalculator import SaleCalculator
 from model.Employee.Statistics import Statistics
@@ -10,26 +11,28 @@ from model.Furniture import Furniture
 
 class Employee(sprite.Sprite):
 
-    def __init__(self, x, y, name, company : Company, abilities=None, images_path=None, salary=None):
+    def __init__(self, x, y, name, company: Company, abilities=None, images_path=None, salary=None, interests=None):
         sprite.Sprite.__init__(self)
         self.name = name
         self._abilities_tuple = abilities
+        self._interests_tuple = interests
         self.images_path = images_path
         self.images_path = "../resources/employees/male/emp1/"
         self.salary = 1000
-        self.got_paid = False
         if salary is not None:
             self.salary = salary
         if images_path is not None:
             self.images_path = images_path
         self.current_position = -1
         self.current_drag_position = 2
+        self.is_interested_in_current_topic = None
         self._company_delegate = company
         self.init_sprite(x, y)
         self.init_data()
         self._calculator = SaleCalculator(self.needs, self.stats)
         self._company_delegate.update_emp_num()
         self.assigned_furniture = None
+        self.block_move = False
 
     def init_sprite(self, x, y):
         self.WALK_LEFT = 0
@@ -48,6 +51,7 @@ class Employee(sprite.Sprite):
         self.SIT_LEFT = 1
         self.SIT_BACK = 2
         self.SIT_BACK2 = 3
+        self.DISAPPEAR = 4
         self.shake_i = -1
         walk_img_names = [
             "employee_walk_left.png",
@@ -71,6 +75,7 @@ class Employee(sprite.Sprite):
             "employee_sit2.png",
             "employee_sit3.png",
             "employee_sit4.png",
+            "employee_sit5.png"
         ]
         shake_img_names = [
             "employee_shake.png",
@@ -85,6 +90,7 @@ class Employee(sprite.Sprite):
         self.shake_images = [image.load(self.images_path + img_name) for img_name in shake_img_names]
         self.mask = mask.from_surface(self.image)
         self.rect = Rect(x, y, self.image.get_width(), self.image.get_height())
+        self.vision_field = Rect(x - 50, y, 100, 5)
 
     def set_desk(self, action_object: Furniture):
         self.assigned_furniture = action_object
@@ -102,13 +108,20 @@ class Employee(sprite.Sprite):
         self.stats = Statistics()
         self.needs = Needs()
         if self._abilities_tuple != None:
-            self._abilities = Abilities(self._abilities_tuple[0], self._abilities_tuple[1], self._abilities_tuple[2])
+            self._abilities = Abilities(self._abilities_tuple[0], self._abilities_tuple[1], self._abilities_tuple[2], self._abilities_tuple[3])
         else:
             self._abilities = Abilities()
+        if self._interests_tuple != None:
+            self.interests = Interests(self._interests_tuple[0], self._interests_tuple[1], self._interests_tuple[2])
+        else:
+            self.interests = Interests()
         self.direction = ''
         self.destination = None
         self.destination_mem = None
         self.coord = (0, 0)  # x - room, y - floor
+        self.got_paid = False
+        self.in_conversation = False
+        self.relations = {}
 
     def get_paid(self):
         self._company_delegate.money -= self.salary
@@ -126,6 +139,8 @@ class Employee(sprite.Sprite):
             return False
         elif self.is_stressed():
             return False
+        elif self.is_empty_bladder():
+            return False
         return True
 
     def update_company(self, papers):
@@ -134,8 +149,18 @@ class Employee(sprite.Sprite):
     def clear_destination_mem(self):
         self.destination_mem = None
 
+    def is_not_fulfilling_needs(self):
+        return not self.is_eating() and not self.is_peeing() and not self.is_playing()
+
+    def is_active(self):
+        return self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting() or self.is_peeing()
+
+    def is_in_need(self):
+        return self.is_empty_bladder() or self.is_stressed() or self.is_hungry()
+
     def is_idle(self):
-        return self.destination is None and not (self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting())
+        return self.destination is None and not (
+                self.is_working() or self.is_eating() or self.is_playing() or self.has_meeting() or self.is_peeing())
 
     def is_working(self):
         return type(self.assigned_furniture).__name__ == "OfficeDesk"
@@ -149,6 +174,9 @@ class Employee(sprite.Sprite):
     def has_meeting(self):
         return type(self.assigned_furniture).__name__ == "ConferenceChair" and not self.is_motivated()
 
+    def is_peeing(self):
+        return type(self.assigned_furniture).__name__ == "ToiletSeat" and not self.is_full_bladder()
+
     def is_satiated(self):
         return self.needs.hunger > 99
 
@@ -158,17 +186,26 @@ class Employee(sprite.Sprite):
     def is_motivated(self):
         return self.needs.motivation > 99
 
+    def is_full_bladder(self):
+        return self.needs.bladder > 99
+
     def is_hungry(self):
         return self.needs.hunger <= self._abilities.stomach
 
     def is_stressed(self):
         return self.needs.stress <= self._abilities.anxiety
 
+    def is_empty_bladder(self):
+        return self.needs.bladder <= 10
+
     def is_unmotivated(self):
         return self.needs.motivation <= self._abilities.boredom
 
     def is_collide_with_mouse(self):
         return self.rect.collidepoint(mouse.get_pos())
+
+    def is_emp_in_vision(self, other_emp):
+        return self.vision_field.colliderect(other_emp.rect)
 
     def is_sitting_on(self, furniture):
         return type(self.assigned_furniture).__name__ == furniture
@@ -207,5 +244,11 @@ class Employee(sprite.Sprite):
     def sitting_sprite_back(self):
         self.image = self.sit_images[self.SIT_BACK]
 
+    def sitting_sprite_disappear(self):
+        self.image = self.sit_images[self.DISAPPEAR]
+
     def sitting_sprite_back_game(self):
         self.image = self.sit_images[self.SIT_BACK2]
+
+    def has_relation_with(self, employee):
+        return self.relations.__contains__(employee)

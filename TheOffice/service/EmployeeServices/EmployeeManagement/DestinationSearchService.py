@@ -33,7 +33,7 @@ class DestinationSearchService:
 
     def search_rooms(self, emp, room_list, dest_room):
         # available room searching algorithm
-        room_dist = 1
+        room_dist = 0
         while True:
             # look for the closest destination room from employee
             room_on_right = emp.coord[0] + room_dist
@@ -81,6 +81,9 @@ class DestinationSearchService:
                 emp.coord = (emp.destination.room.place_index, emp.destination.room.floor)
             elif type(emp.destination).__name__ == "GameSpot":
                 self.task_service_t.insert_emp(emp, "stress")
+                emp.coord = (emp.destination.room.place_index, emp.destination.room.floor)
+            elif type(emp.destination).__name__ == "ToiletSeat":
+                self.task_service_t.insert_emp(emp, "bladder")
                 emp.coord = (emp.destination.room.place_index, emp.destination.room.floor)
             elif type(emp.destination).__name__ == "Elevator":
                 self.change_destination(emp, emp.destination_mem)

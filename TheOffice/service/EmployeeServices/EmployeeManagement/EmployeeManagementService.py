@@ -1,3 +1,5 @@
+import random
+
 from pygame import time, mouse
 
 from model.Company import Company
@@ -13,12 +15,13 @@ from service.EmployeeThreads.EmployeeTaskThread import EmployeeTaskThread
 
 
 class EmployeeManagementService:
-    def __init__(self, room_board, ground: Ground):
+    def __init__(self, room_board, ground: Ground, animation_service: AnimationService):
         self.employee_list = []
         self.init_extras()
         self.room_board = room_board
         self.ground = ground
         self.init_threads()
+        self.animation_service = animation_service
         self.init_services()
 
     def check_employees_needs_and_move(self):
@@ -29,27 +32,37 @@ class EmployeeManagementService:
 
     def check_emp_needs_and_move(self, emp: Employee):
         if emp.destination is None:
-            # the moment when employee starts feeling hungry
-            if emp.is_hungry():
-                if (not emp.is_playing() and not emp.is_eating()) or emp.is_relaxed():
+            # the moment when employee starts feeling the need
+            if emp.is_empty_bladder():
+                if emp.is_not_fulfilling_needs() or (emp.is_relaxed() and emp.is_satiated()):
+                    self.task_service_t.pop_emp(emp, "motivation")
+                    self.task_service_t.pop_emp(emp, "work")
+                    self.task_service_t.pop_emp(emp, "stress")
+                    self.task_service_t.pop_emp(emp, "hunger")
+                    self.dest_service.search_for_room(emp, "Toilet")
+            elif emp.is_hungry():
+                if emp.is_not_fulfilling_needs() or (emp.is_relaxed() and emp.is_full_bladder()):
                     self.task_service_t.pop_emp(emp, "work")
                     self.task_service_t.pop_emp(emp, "stress")
                     self.task_service_t.pop_emp(emp, "motivation")
+                    self.task_service_t.pop_emp(emp, "bladder")
                     self.dest_service.search_for_room(emp, "DiningRoom")
             elif emp.is_stressed():
-                if (not emp.is_playing() and not emp.is_eating()) or emp.is_satiated():
+                if emp.is_not_fulfilling_needs() or (emp.is_satiated() and emp.is_full_bladder()):
                     self.task_service_t.pop_emp(emp, "motivation")
                     self.task_service_t.pop_emp(emp, "work")
                     self.task_service_t.pop_emp(emp, "hunger")
+                    self.task_service_t.pop_emp(emp, "bladder")
                     self.dest_service.search_for_room(emp, "GameRoom")
             # when employee just stands on ground
             elif emp.is_idle():
                 self.task_service_t.pop_emp(emp, "stress")
                 self.task_service_t.pop_emp(emp, "motivation")
                 self.task_service_t.pop_emp(emp, "hunger")
+                self.task_service_t.pop_emp(emp, "bladder")
                 self.dest_service.search_for_room(emp, "OfficeRoom")
         # movement logic towards destination
-        if emp.destination is not None and not emp.is_collide_with_mouse() and self.ground.is_touching_adjusted(emp):
+        if emp.destination is not None and not emp.is_collide_with_mouse() and self.ground.is_touching_adjusted(emp) and not emp.block_move:
             if emp.is_sitting_down():
                 emp.remove_from_desk()
             self.move_emp_towards_destination(emp)
@@ -98,7 +111,6 @@ class EmployeeManagementService:
     def init_services(self):
         self.dest_service = DestinationSearchService(self.room_board, self.task_service_t)
         self.collision_service = CollisionService(self.room_board, self.task_service_t)
-        self.animation_service = AnimationService()
 
     def drag_emp_if_selected(self):
         if self.dragged_emp_i != -1:
@@ -141,16 +153,17 @@ class EmployeeManagementService:
             self.collision_service.handle_emp_desk_collide(self.employee_list[self.dragged_emp_i])
         self.dragged_emp_i = -1
 
-    def move_emp_towards_destination(self, emp):
-        x = 0
+    def move_emp_towards_destination(self, emp :Employee):
+        x=0
         emp.direction = ''
-        if emp.destination.rect.x > emp.rect.x + 5:
-            x = 5
+        if emp.destination.rect.x > emp.rect.x + 4:
+            x = emp._abilities.speed
             emp.direction = 'R'
-        elif emp.destination.rect.x < emp.rect.x - 5:
-            x = -5
+        elif emp.destination.rect.x < emp.rect.x - 4:
+            x = -emp._abilities.speed
             emp.direction = 'L'
         emp.rect = emp.rect.move(x, 0)
+        emp.vision_field.x = emp.rect.x
         self.animation_service.animate_employee(emp)
 
     def gravity_employee(self, emp: Employee):
@@ -180,3 +193,5 @@ class EmployeeManagementService:
         if self.employee_list[0].got_paid:
             for employee in self.employee_list:
                 employee.got_paid = False
+
+

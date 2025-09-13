@@ -13,10 +13,11 @@ class BuildingElement(InterfaceElement):
             transform.scale(image.load("../resources/rooms/dining_room.png"), (200, 200)),
             transform.scale(image.load("../resources/rooms/game_room.png"), (200, 200)),
             transform.scale(image.load("../resources/rooms/conference_room.png"), (200, 200)),
+            transform.scale(image.load("../resources/rooms/toilet.png"), (200, 200)),
             transform.scale(image.load("../resources/interface/elements/building/new_floor.png"), (200, 200)),
         ]
         self._room_cost_dict = {RoomType.OFFICE_ROOM: 5000, RoomType.DINING_ROOM: 4000, RoomType.GAME_ROOM: 4500,
-                                RoomType.CONFERENCE_ROOM: 6000, RoomType.NEW_FLOOR: 20000}
+                                RoomType.CONFERENCE_ROOM: 6000, RoomType.TOILET: 3500, RoomType.NEW_FLOOR: 20000}
         self._room_index = 0
         self.background_surface = Surface((320, 220))
         self.background_surface.set_alpha(180)

@@ -54,6 +54,7 @@ class KeyboardController:
     def move_objects(self, x, y):
         for emp in self.emp_list:
             emp.rect = emp.rect.move(x, y)
+            emp.vision_field = emp.vision_field.move(x, y)
         # for each action object in each room in each floor move them according to camera position
         for floor in self.room_board:
             for room in floor:

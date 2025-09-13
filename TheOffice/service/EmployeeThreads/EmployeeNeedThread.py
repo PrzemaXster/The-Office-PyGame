@@ -30,6 +30,7 @@ class EmployeeNeedThread(Thread):
                     if need_i <= 1:
                         if employee.is_working():
                             employee.needs.decrease_stress()
+                            employee.needs.decrease_bladder()
                     if need_i == 1:
                         employee.needs.decrease_hunger()
                     elif need_i == 2:

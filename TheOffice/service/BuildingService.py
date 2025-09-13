@@ -4,6 +4,7 @@ from model.DiningRoom.DiningRoom import DiningRoom
 from model.ElevatorRoom.ElevatorRoom import ElevatorRoom
 from model.GameRoom.GameRoom import GameRoom
 from model.OfficeRoom.OfficeRoom import OfficeRoom
+from model.Toilet.Toilet import Toilet
 
 
 class BuildingService:
@@ -62,6 +63,14 @@ class BuildingService:
             conference_room = ConferenceRoom(board_pos, self.room_board)
             self.room_board[board_pos[1]][board_pos[0]] = conference_room
 
+    def build_toilet(self, board_pos):
+        self.validate_board_pos(board_pos)
+        if board_pos[0] == len(self.room_board[board_pos[1]]):
+            toilet = Toilet(board_pos, self.room_board)
+            self.room_board[board_pos[1]].append(toilet)
+        else:
+            toilet = Toilet(board_pos, self.room_board)
+            self.room_board[board_pos[1]][board_pos[0]] = toilet
     def build_corridor(self, board_pos):
         self.validate_board_pos(board_pos)
         if board_pos[0] == len(self.room_board[board_pos[1]]):

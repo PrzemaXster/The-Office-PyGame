@@ -2,7 +2,6 @@ import pygame
 
 from controller.BuildController import BuildingController
 from model.CursorObject import CursorObject
-from model.Interface.StaticElement import StaticElement
 from service.Interface.InterfaceService import InterfaceService
 from service.RoomType import RoomType
 
