@@ -11,19 +11,19 @@ class Needs:
 
     def eat(self):
         if self.hunger <= 100 - self._abilities.stomach:
-            self.hunger += self._abilities.stomach * 2
+            self.hunger += self._abilities.stomach * 3
         else:
             self.hunger = 100
 
     def play(self):
         if self.stress <= 100 - self._abilities.anxiety:
-            self.stress += self._abilities.anxiety
+            self.stress += self._abilities.anxiety * 3
         else:
             self.stress = 100
 
     def meet(self):
         if self.motivation <= 100 - self._abilities.boredom:
-            self.motivation += self._abilities.boredom * 3
+            self.motivation += self._abilities.boredom * 4
 
     def pee(self):
         if self.bladder <= 100:

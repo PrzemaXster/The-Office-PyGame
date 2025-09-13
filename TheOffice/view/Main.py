@@ -221,12 +221,12 @@ class Game:
     def init_animations(self):
         self.speech_bubble_disagree = AnimationObject(Rect(30, 30, 40, 40), [pygame.image.load(
             "../resources/static_animations/speech_bubbles/disagree/disagree.png")],
-                                                      self.animation_event_listener, 125, 3000)
+                                                      self.animation_event_listener, 125, 1500)
         self.speech_bubble_laugh = AnimationObject(Rect(30, 30, 40, 40), [
             pygame.image.load("../resources/static_animations/speech_bubbles/laugh/laugh_1.png"),
             pygame.image.load("../resources/static_animations/speech_bubbles/laugh/laugh_2.png"),
             pygame.image.load("../resources/static_animations/speech_bubbles/laugh/laugh_3.png")],
-                                                   self.animation_event_listener, 125, 3000)
+                                                   self.animation_event_listener, 125, 1500)
 
         self.animation_box = {
             "speech_bubbles": [self.speech_bubble_disagree, self.speech_bubble_laugh, self.speech_bubble_laugh,

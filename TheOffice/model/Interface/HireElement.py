@@ -11,9 +11,9 @@ class HireElement(InterfaceElement):
         super().__init__(rect, img)
         self._company = company
         self._emp_list = [
-            {"name": "Steve", "abilities": (6, 4, 7), "images_path": "../resources/employees/male/emp2/", "salary": 3400},
-            {"name": "Joe", "abilities": (7, 4, 2), "images_path": "../resources/employees/male/emp3/", "salary": 3400},
-            {"name": "Marle", "abilities": (3, 8, 8), "images_path": "../resources/employees/female/emp1/", "salary": 3400},
+            {"name": "Steve", "abilities": (6, 4, 7, 6), "images_path": "../resources/employees/male/emp2/", "salary": 3400},
+            {"name": "Joe", "abilities": (7, 4, 2, 4), "images_path": "../resources/employees/male/emp3/", "salary": 3400},
+            {"name": "Marle", "abilities": (3, 8, 5, 6), "images_path": "../resources/employees/female/emp1/", "salary": 3400},
         ]
         self._init_emp_lists()
         self._emp_index = 0
@@ -65,13 +65,12 @@ class HireElement(InterfaceElement):
         if random.randint(0, 1) == self.MALE:
             self._emp_list.append(
                 {"name": self._emp_names_male[random.randint(0, len(self._emp_names_male) - 1)],
-                 "abilities": (random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)),
                  "images_path": self._emp_images_male[random.randint(0, len(self._emp_images_male) - 1)],
                  "salary": random.randint(3000, 4000)})
         else:
             self._emp_list.append(
                 {"name": self._emp_names_female[random.randint(0, len(self._emp_names_female) - 1)],
-                 "abilities": (random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)),
+                 "abilities": (random.randint(5, 10), random.randint(3, 7), random.randint(4, 15), random.randint(4, 6)),
                  "images_path": self._emp_images_female[random.randint(0, len(self._emp_images_female) - 1)],
                  "salary": random.randint(3000, 4000)})
 

@@ -12,9 +12,9 @@ class ConversationService:
         self.employee_list = employee_list
         self.LETS_TALK = 4
         self.conversation_pairs = []
-        self.FIRST_SPEAK = 3000
-        self.SECOND_SPEAK = 6000
-        self.END_SPEAK = 12000
+        self.FIRST_SPEAK = 1500
+        self.SECOND_SPEAK = 3000
+        self.END_SPEAK = 8000
         self.conversation_result_list = []
         self.animation_box = animation_box
 
@@ -57,8 +57,9 @@ class ConversationService:
                         self.initiate_conversation(emp, emp2)
 
     def emps_are_passing_by(self, emp, emp2):
-        return emp.is_emp_in_vision(
-            emp2) and not (emp.in_conversation or emp2.in_conversation or emp2.is_active() or emp.is_active() or emp.is_in_need() or emp2.is_in_need())
+        return (emp.is_emp_in_vision(emp2)
+                and not (emp.in_conversation or emp2.in_conversation or emp2.is_working()
+                         or emp.is_working() or emp2.is_peeing() or emp.is_peeing() or emp.is_in_need() or emp2.is_in_need()))
 
     def initiate_conversation(self, emp: Employee, emp2: Employee):
         emp.in_conversation = True

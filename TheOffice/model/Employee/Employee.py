@@ -108,7 +108,7 @@ class Employee(sprite.Sprite):
         self.stats = Statistics()
         self.needs = Needs()
         if self._abilities_tuple != None:
-            self._abilities = Abilities(self._abilities_tuple[0], self._abilities_tuple[1], self._abilities_tuple[2])
+            self._abilities = Abilities(self._abilities_tuple[0], self._abilities_tuple[1], self._abilities_tuple[2], self._abilities_tuple[3])
         else:
             self._abilities = Abilities()
         if self._interests_tuple != None:

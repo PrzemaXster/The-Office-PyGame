@@ -153,14 +153,14 @@ class EmployeeManagementService:
             self.collision_service.handle_emp_desk_collide(self.employee_list[self.dragged_emp_i])
         self.dragged_emp_i = -1
 
-    def move_emp_towards_destination(self, emp):
-        x = 0
+    def move_emp_towards_destination(self, emp :Employee):
+        x=0
         emp.direction = ''
-        if emp.destination.rect.x > emp.rect.x + 5:
-            x = 5
+        if emp.destination.rect.x > emp.rect.x + 4:
+            x = emp._abilities.speed
             emp.direction = 'R'
-        elif emp.destination.rect.x < emp.rect.x - 5:
-            x = -5
+        elif emp.destination.rect.x < emp.rect.x - 4:
+            x = -emp._abilities.speed
             emp.direction = 'L'
         emp.rect = emp.rect.move(x, 0)
         emp.vision_field.x = emp.rect.x
