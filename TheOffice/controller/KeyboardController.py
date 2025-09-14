@@ -61,6 +61,7 @@ class KeyboardController:
                 room.rect = room.rect.move(x, y)
                 for a_obj in room.action_objects:
                     a_obj.rect = a_obj.rect.move(x, y)
+
         for corridor in self.corridors:
             corridor.rect = corridor.rect.move(x, y)
         self.ground.move(y)

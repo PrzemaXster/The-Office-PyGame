@@ -8,7 +8,7 @@ from model.Interface.InterfaceElement import InterfaceElement
 class EmployeeStatElement(InterfaceElement):
     def __init__(self, rect, image):
         super().__init__(rect, image)
-        self.background_surface = Surface((170, 115))
+        self.background_surface = Surface((170, 140))
         self.background_surface.set_alpha(180)
         self.background_surface.fill((0, 0, 0))
         self._sysfont = font.SysFont("Calibri", 18, True)

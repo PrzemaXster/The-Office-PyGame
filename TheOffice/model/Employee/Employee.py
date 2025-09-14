@@ -90,7 +90,7 @@ class Employee(sprite.Sprite):
         self.shake_images = [image.load(self.images_path + img_name) for img_name in shake_img_names]
         self.mask = mask.from_surface(self.image)
         self.rect = Rect(x, y, self.image.get_width(), self.image.get_height())
-        self.vision_field = Rect(x - 50, y, 100, 5)
+        self.vision_field = Rect(x - 70, y, 140, 5)
 
     def set_desk(self, action_object: Furniture):
         self.assigned_furniture = action_object
@@ -120,7 +120,7 @@ class Employee(sprite.Sprite):
         self.destination_mem = None
         self.coord = (0, 0)  # x - room, y - floor
         self.got_paid = False
-        self.in_conversation = False
+        self.in_interaction = False
         self.relations = {}
 
     def get_paid(self):

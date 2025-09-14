@@ -7,6 +7,7 @@ from controller.BuildController import BuildingController
 from controller.EmployeeController import EmployeeController
 from controller.KeyboardController import KeyboardController
 from controller.MouseController import MouseController
+from model.Animation.AnimationCollection import AnimationCollection
 from model.Animation.AnimationEventListener import AnimationEventListener
 from model.Animation.AnimationObject import AnimationObject
 from model.Company import Company
@@ -47,6 +48,7 @@ class Game:
             self.employee_controller.hire_employee(self.first_room.rect.midleft)
             self.animation_service.animate_objects()
             self.conversation_service.make_emps_converse()
+            self.conversation_service.make_emps_argue()
             self.conversation_service.manage_emps_conversations()
             self.interface_service.update_time()
             self.draw()
@@ -120,14 +122,13 @@ class Game:
             self.screen.blit(self.interface_service.emp_stat_element.motivation_bar,
                              self.interface_service.emp_stat_element.rect.move(110, 75))
             self.screen.blit(self.interface_service.emp_stat_element.bladder_text,
-                             self.interface_service.emp_stat_element.rect.move(10,90 ))
+                             self.interface_service.emp_stat_element.rect.move(10, 90))
             self.screen.blit(self.interface_service.emp_stat_element.bladder_bar,
                              self.interface_service.emp_stat_element.rect.move(110, 90))
             self.screen.blit(self.interface_service.emp_stat_element.sales_number_text,
                              self.interface_service.emp_stat_element.rect.move(120, 110))
             self.screen.blit(self.interface_service.emp_stat_element.sales_text,
                              self.interface_service.emp_stat_element.rect.move(10, 110))
-
 
         # draw different views based on which icon user clicked
         if self.interface_service.view_type == self.interface_service.HIRE_EMPLOYEE:
@@ -185,7 +186,6 @@ class Game:
         self.company.money = 20000
 
         self.animation_event_listener = AnimationEventListener()
-        self.init_animations()
         self.animation_service = AnimationService(self.animation_event_listener)
         self.interface_service = InterfaceService(self.company)
 
@@ -193,8 +193,6 @@ class Game:
         self.employee_controller = EmployeeController(self.building_controller.get_room_board(), self.ground,
                                                       self.company,
                                                       self.interface_service, self.animation_service)
-        self.conversation_service = ConversationService(self.employee_controller.employee_service.employee_list,
-                                                        self.animation_box)
 
         self.employee_controller.create_employee(100, 200)
         self.building_controller.build_room((0, 0), RoomType.TOILET)
@@ -204,6 +202,10 @@ class Game:
         self.building_controller.build_room((4, 0), RoomType.CORRIDOR)
         self.building_controller.build_room((5, 0), RoomType.CONFERENCE_ROOM)
         self.building_controller.build_room((6, 0), RoomType.CORRIDOR)
+
+        self.init_animations()
+        self.conversation_service = ConversationService(self.employee_controller.employee_service.employee_list,
+                                                        self.animation_box)
 
         self.mouse_controller = MouseController(self.screen, self.employee_controller.employee_service.employee_list,
                                                 self.building_controller, self.ground, self.interface_service)
@@ -219,19 +221,60 @@ class Game:
         self.employee_controller.employee_service.employee_list[0].needs.bladder = 10
 
     def init_animations(self):
+        self.animation_box = {}
         self.speech_bubble_disagree = AnimationObject(Rect(30, 30, 40, 40), [pygame.image.load(
-            "../resources/static_animations/speech_bubbles/disagree/disagree.png")],
+            "../resources/animations/speech_bubbles/disagree/disagree.png")],
                                                       self.animation_event_listener, 125, 1500)
         self.speech_bubble_laugh = AnimationObject(Rect(30, 30, 40, 40), [
-            pygame.image.load("../resources/static_animations/speech_bubbles/laugh/laugh_1.png"),
-            pygame.image.load("../resources/static_animations/speech_bubbles/laugh/laugh_2.png"),
-            pygame.image.load("../resources/static_animations/speech_bubbles/laugh/laugh_3.png")],
+            pygame.image.load("../resources/animations/speech_bubbles/laugh/laugh_1.png"),
+            pygame.image.load("../resources/animations/speech_bubbles/laugh/laugh_2.png"),
+            pygame.image.load("../resources/animations/speech_bubbles/laugh/laugh_3.png")],
                                                    self.animation_event_listener, 125, 1500)
 
-        self.animation_box = {
-            "speech_bubbles": [self.speech_bubble_disagree, self.speech_bubble_laugh, self.speech_bubble_laugh,
-                               self.speech_bubble_laugh],
-        }
+        self.speech_bubble_technology = AnimationObject(Rect(30, 30, 40, 40), [
+            pygame.image.load("../resources/animations/speech_bubbles/technology/technology_1.png"),
+            pygame.image.load("../resources/animations/speech_bubbles/technology/technology_2.png"),
+            pygame.image.load("../resources/animations/speech_bubbles/technology/technology_3.png")],
+                                                   self.animation_event_listener, 250, 1500)
+        self.speech_bubble_sport = AnimationObject(Rect(30, 30, 40, 40), [
+            pygame.image.load("../resources/animations/speech_bubbles/sport/sport.png")],
+                                                        self.animation_event_listener, 500, 1500)
+
+        self.argue_bubble = AnimationObject(Rect(30, 30, 40, 40), [
+            pygame.image.load("../resources/animations/argument_bubbles/argue_1.png"),
+            pygame.image.load("../resources/animations/argument_bubbles/argue_2.png"),
+            pygame.image.load("../resources/animations/argument_bubbles/argue_3.png")
+        ], self.animation_event_listener, 125, 1500)
+
+        self.animation_box.update({
+            "speech_bubbles": [self.speech_bubble_disagree, self.speech_bubble_laugh, self.speech_bubble_technology,
+                               self.speech_bubble_sport],
+        })
+        self.animation_box.update({
+            "argument_bubble": self.argue_bubble,
+        })
+        hover_circle_animation_list = []
+        for floor in self.building_controller.get_room_board():
+            for room in floor:
+                for action_object in room.action_objects:
+                    hover_circle_animation_list.append(AnimationObject(action_object.rect, [
+                        pygame.image.load("../resources/dynamic_animations/hover_circle/hover_circle_default.png")],
+                                                                       self.animation_event_listener, 1000))
+
+        self.hover_circle_default = AnimationCollection(hover_circle_animation_list.copy())
+        hover_circle_animation_list.clear()
+        for floor in self.building_controller.get_room_board():
+            for room in floor:
+                for action_object in room.action_objects:
+                    hover_circle_animation_list.append(AnimationObject(action_object.rect, [
+                        pygame.image.load("../resources/animations/hover_circle/hover_circle_active_1.png"),
+                        pygame.image.load("../resources/animations/hover_circle/hover_circle_active_2.png")
+                    ],
+                                                                       self.animation_event_listener))
+        self.hover_circle_active = AnimationCollection(hover_circle_animation_list.copy())
+        self.animation_box.update({"hover_circle_default":self.hover_circle_default})
+        self.animation_box.update({"hover_circle_active":self.hover_circle_active})
+        self.animation_box.get("hover_circle_active")
 
     def init_texts(self):
         self.font = pygame.font.SysFont("Calibri", 24, True)
