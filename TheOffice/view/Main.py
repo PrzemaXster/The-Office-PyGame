@@ -36,7 +36,7 @@ class Game:
                     pygame.sys.exit(0)
                 self.keyboard_controller.execute_event(event)
                 self.mouse_controller.execute_event(event)
-                self.employee_controller.grab_employee_event(event)
+                self.mouse_controller.grab_employee_event(event)
             self.screen.fill((155, 232, 255))
             self.employee_controller.drag_employee()
             self.employee_controller.manage_salaries()
@@ -171,6 +171,17 @@ class Game:
                              self.interface_service.calendar_element.month_text_rect)
             if self.interface_service.calendar_element.at_current_page():
                 pygame.draw.rect(self.screen, (255, 0, 0), self.interface_service.calendar_element.page_marker_rect, 3)
+        elif self.interface_service.view_type == self.interface_service.EMP_FULL_STATS:
+            self.screen.blit(self.interface_service.emp_stat_full_element.background_surface,
+                             self.interface_service.emp_stat_element.rect.move(-20, -20))
+            self.screen.blit(self.interface_service.emp_stat_full_element.title_text,
+                             self.interface_service.emp_stat_full_element.stat_rect)
+            self.screen.blit(self.interface_service.emp_stat_full_element.salary_text,
+                             self.interface_service.emp_stat_full_element.stat_rect.move(-10, 30))
+            self.screen.blit(self.interface_service.emp_stat_full_element.hire_date,
+                             self.interface_service.emp_stat_full_element.stat_rect.move(-10, 60))
+            self.screen.blit(self.interface_service.emp_stat_full_element.papers_sold_text,
+                             self.interface_service.emp_stat_full_element.stat_rect.move(-10, 90))
 
         for animation in self.animation_service.anim_object_list:
             self.screen.blit(animation.current_sprite, animation.rect)
@@ -208,7 +219,7 @@ class Game:
                                                         self.animation_box)
 
         self.mouse_controller = MouseController(self.screen, self.employee_controller.employee_service.employee_list,
-                                                self.building_controller, self.ground, self.interface_service)
+                                                self.building_controller, self.ground, self.interface_service, self.employee_controller.employee_service)
         self.keyboard_controller = KeyboardController(self.employee_controller, self.building_controller,
                                                       self.mouse_controller.cursor,
                                                       self.company, self.ground)

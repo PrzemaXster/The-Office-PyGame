@@ -11,18 +11,15 @@ from model.Furniture import Furniture
 
 class Employee(sprite.Sprite):
 
-    def __init__(self, x, y, name, company: Company, abilities=None, images_path=None, salary=None, interests=None):
+    def __init__(self, x, y, name, company: Company, abilities=None, images_path=None, salary=1000, hire_date=None, interests=None):
         sprite.Sprite.__init__(self)
         self.name = name
         self._abilities_tuple = abilities
         self._interests_tuple = interests
         self.images_path = images_path
         self.images_path = "../resources/employees/male/emp1/"
-        self.salary = 1000
-        if salary is not None:
-            self.salary = salary
-        if images_path is not None:
-            self.images_path = images_path
+        self._salary = salary
+        self._hire_date = hire_date
         self.current_position = -1
         self.current_drag_position = 2
         self.is_interested_in_current_topic = None
@@ -105,7 +102,7 @@ class Employee(sprite.Sprite):
         self.image = image.load(self.images_path + "/employee.png")
 
     def init_data(self):
-        self.stats = Statistics()
+        self.stats = Statistics(self._salary, self._hire_date)
         self.needs = Needs()
         if self._abilities_tuple != None:
             self._abilities = Abilities(self._abilities_tuple[0], self._abilities_tuple[1], self._abilities_tuple[2], self._abilities_tuple[3])
@@ -124,7 +121,7 @@ class Employee(sprite.Sprite):
         self.relations = {}
 
     def get_paid(self):
-        self._company_delegate.money -= self.salary
+        self._company_delegate.money -= self._salary
         self.got_paid = True
 
     def make_sale(self):

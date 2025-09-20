@@ -2,17 +2,23 @@ import pygame
 
 from controller.BuildController import BuildingController
 from model.CursorObject import CursorObject
+from service.EmployeeServices.EmployeeManagement.EmployeeManagementService import EmployeeManagementService
 from service.Interface.InterfaceService import InterfaceService
 from service.RoomType import RoomType
 
 
 class MouseController:
-    def __init__(self, screen, employee_list, building_controller: BuildingController, ground, interface_service: InterfaceService):
+    def __init__(self, screen, employee_list, building_controller: BuildingController, ground, interface_service: InterfaceService,employee_service : EmployeeManagementService):
+        self.LEFT_CLICK = 1
+        self.MIDDLE_CLICK = 2
+        self.RIGHT_CLICK = 3
+
         self.screen = screen
         self.emp_list = employee_list
         self.building_controller = building_controller
         self.room_board = building_controller.building_service.room_board
         self.corridors = building_controller.building_service.corridors
+        self.employee_service = employee_service
         self.interface_service = interface_service
         self.ground = ground
         self.speed = 15
@@ -47,7 +53,7 @@ class MouseController:
         self.cursor.clear_cursor()
 
     def execute_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == self.LEFT_CLICK:
             if self.cursor.drags_room():
                 self.place_building()
             for element in self.interface_service.element_list:
@@ -60,6 +66,11 @@ class MouseController:
             if self.interface_service.purchased_room != RoomType.NONE:
                 self.cursor.set_cursor_object(self.interface_service.purchased_room)
                 self.interface_service.purchased_room = RoomType.NONE
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == self.RIGHT_CLICK:
+            for emp in self.emp_list:
+                if self.cursor.collides_with(emp.rect):
+                    self.interface_service.right_click_emp_full_stats()
+                    self.interface_service.emp_stat_full_element.update_emp_full_stats(emp)
 
         self.hover_event()
 
@@ -72,3 +83,12 @@ class MouseController:
         for emp in self.emp_list:
             if emp.is_collide_with_mouse():
                 self.interface_service.emp_stat_element.update_emp_stats(emp)
+
+    def grab_employee_event(self, event):
+        for i in range(0, len(self.employee_service.employee_list)):
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == self.LEFT_CLICK:
+                self.employee_service.pick_up_employee(i)
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == self.LEFT_CLICK:
+                self.employee_service.put_down_employee(i)
+
+
