@@ -91,6 +91,17 @@ class Game:
         for emp in self.employee_controller.employee_service.employee_list:
             self.screen.blit(emp.image, emp.rect)
 
+        self.draw_interface()
+
+        for animation in self.animation_service.anim_object_list:
+            self.screen.blit(animation.current_sprite, animation.rect)
+
+        pygame.draw.line(self.screen, (0, 0, 0), (397, 55), self.interface_service.clock_element.clk_pointer, 5)
+        # self.screen.blit(self.hunger, self.text_rect.move(0, 125))
+        # self.screen.blit(self.stress, self.text_rect.move(0, 100))
+        # self.screen.blit(self.motivation, self.text_rect.move(0, 150))
+
+    def draw_interface(self):
         # draw all elements of interface
         for element in self.interface_service.element_list:
             # icons should always be displayed and elements should only be displayed if user clicked on icon
@@ -173,7 +184,7 @@ class Game:
                 pygame.draw.rect(self.screen, (255, 0, 0), self.interface_service.calendar_element.page_marker_rect, 3)
         elif self.interface_service.view_type == self.interface_service.EMP_FULL_STATS:
             self.screen.blit(self.interface_service.emp_stat_full_element.background_surface,
-                             self.interface_service.emp_stat_element.rect.move(-20, -20))
+                             self.interface_service.emp_stat_full_element.rect)
             self.screen.blit(self.interface_service.emp_stat_full_element.title_text,
                              self.interface_service.emp_stat_full_element.stat_rect)
             self.screen.blit(self.interface_service.emp_stat_full_element.salary_text,
@@ -182,14 +193,7 @@ class Game:
                              self.interface_service.emp_stat_full_element.stat_rect.move(-10, 60))
             self.screen.blit(self.interface_service.emp_stat_full_element.papers_sold_text,
                              self.interface_service.emp_stat_full_element.stat_rect.move(-10, 90))
-
-        for animation in self.animation_service.anim_object_list:
-            self.screen.blit(animation.current_sprite, animation.rect)
-
-        pygame.draw.line(self.screen, (0, 0, 0), (397, 55), self.interface_service.clock_element.clk_pointer, 5)
-        # self.screen.blit(self.hunger, self.text_rect.move(0, 125))
-        # self.screen.blit(self.stress, self.text_rect.move(0, 100))
-        # self.screen.blit(self.motivation, self.text_rect.move(0, 150))
+            self.screen.blit(self.interface_service.emp_stat_full_element.emp_name_text, self.interface_service.emp_stat_full_element.visual_rect)
 
     def init_objects(self):
         self.ground = Ground(self.screen)
@@ -219,7 +223,8 @@ class Game:
                                                         self.animation_box)
 
         self.mouse_controller = MouseController(self.screen, self.employee_controller.employee_service.employee_list,
-                                                self.building_controller, self.ground, self.interface_service, self.employee_controller.employee_service)
+                                                self.building_controller, self.ground, self.interface_service,
+                                                self.employee_controller.employee_service)
         self.keyboard_controller = KeyboardController(self.employee_controller, self.building_controller,
                                                       self.mouse_controller.cursor,
                                                       self.company, self.ground)
@@ -246,10 +251,10 @@ class Game:
             pygame.image.load("../resources/animations/speech_bubbles/technology/technology_1.png"),
             pygame.image.load("../resources/animations/speech_bubbles/technology/technology_2.png"),
             pygame.image.load("../resources/animations/speech_bubbles/technology/technology_3.png")],
-                                                   self.animation_event_listener, 250, 1500)
+                                                        self.animation_event_listener, 250, 1500)
         self.speech_bubble_sport = AnimationObject(Rect(30, 30, 40, 40), [
             pygame.image.load("../resources/animations/speech_bubbles/sport/sport.png")],
-                                                        self.animation_event_listener, 500, 1500)
+                                                   self.animation_event_listener, 500, 1500)
 
         self.argue_bubble = AnimationObject(Rect(30, 30, 40, 40), [
             pygame.image.load("../resources/animations/argument_bubbles/argue_1.png"),
@@ -283,8 +288,8 @@ class Game:
                     ],
                                                                        self.animation_event_listener))
         self.hover_circle_active = AnimationCollection(hover_circle_animation_list.copy())
-        self.animation_box.update({"hover_circle_default":self.hover_circle_default})
-        self.animation_box.update({"hover_circle_active":self.hover_circle_active})
+        self.animation_box.update({"hover_circle_default": self.hover_circle_default})
+        self.animation_box.update({"hover_circle_active": self.hover_circle_active})
         self.animation_box.get("hover_circle_active")
 
     def init_texts(self):

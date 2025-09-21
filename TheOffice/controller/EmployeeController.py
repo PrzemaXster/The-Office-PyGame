@@ -40,6 +40,9 @@ class EmployeeController:
         self.employee_service.create_employee(x, y,
                                               self.employee_names[random.randint(0, len(self.employee_names) - 1)],
                                               self.company)
+        emp = self.employee_service.employee_list[0]
+        emp.stats.hire_date = self.interface_service.calendar_element.current_date
+
 
     def drag_employee(self):
         self.employee_service.drag_emp_if_selected()

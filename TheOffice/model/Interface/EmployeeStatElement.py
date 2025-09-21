@@ -2,12 +2,13 @@ from pygame import font
 from pygame.surface import Surface
 
 from model.Employee.Employee import Employee
+from model.Interface.ActorInteractionInterfaceElement import ActorInteractionInterfaceElement
 from model.Interface.InterfaceElement import InterfaceElement
 
 
-class EmployeeStatElement(InterfaceElement):
-    def __init__(self, rect, image):
-        super().__init__(rect, image)
+class EmployeeStatElement(ActorInteractionInterfaceElement):
+    def __init__(self, rect, image, on_hover):
+        super().__init__(rect, image, on_hover=on_hover)
         self.background_surface = Surface((170, 140))
         self.background_surface.set_alpha(180)
         self.background_surface.fill((0, 0, 0))
@@ -42,4 +43,3 @@ class EmployeeStatElement(InterfaceElement):
         self.bladder_bar.fill((255, 255 , 0))
         self.sales_number_text = self._sysfont.render(str(emp.stats.papers_sold), True, (255, 255, 255))
         self.emp_name_text = self._sysfont.render(str(emp.name), True, (255, 255, 255))
-        self.hover_effect = self.SHOW_STATISTICS

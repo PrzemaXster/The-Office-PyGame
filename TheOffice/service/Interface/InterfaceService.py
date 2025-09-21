@@ -1,6 +1,8 @@
 from pygame import image, time
 from pygame.rect import Rect
 
+from model.Employee.Employee import Employee
+from model.Interface.ActorInteractionInterfaceElement import ActorInteractionInterfaceElement
 from model.Interface.BuildingElement import BuildingElement
 from model.Interface.CalendarElement import CalendarElement
 from model.Interface.ClockElement import ClockElement
@@ -24,8 +26,8 @@ class InterfaceService:
         self.hire_element = HireElement(Rect(290, 200, 60, 140), image.load("../resources/employees/male/emp1/employee.png"), company)
         self.statistics_element = CompanyStatisticsElement(Rect(250, 170, 283, 192),
                                                            image.load("../resources/interface/elements/statistics/game_stats.png"), company)
-        self.emp_stat_element = EmployeeStatElement(Rect(0, 0, 0, 0), None)
-        self.emp_stat_full_element = EmployeeStatFullElement(Rect(0, 0, 0, 0), None, company)
+        self.emp_stat_element = EmployeeStatElement(Rect(0, 0, 0, 0), None, on_hover=self.show_emp_stats)
+        self.emp_stat_full_element = EmployeeStatFullElement(Rect(250, 170, 283, 192), None, company, self.right_click_emp_full_stats)
 
         self.arrow_right_element = InterfaceElement(Rect(570, 170, 100, 170), image.load("../resources/interface/elements/right.png"),
                                                     self.switch_view_right, self.drop_shadow)
@@ -133,12 +135,17 @@ class InterfaceService:
         else:
             self.view_type = self.STATISTICS
 
-    def right_click_emp_full_stats(self):
+    def right_click_emp_full_stats(self, emp: Employee):
         if self.view_type != self.NO_TYPE:
             self.view_type = self.NO_TYPE
         else:
             self.view_type = self.EMP_FULL_STATS
+            self.emp_stat_full_element.update_emp_full_stats(emp)
 
     # on hovers
     def drop_shadow(self, element: InterfaceElement):
         element.hover_effect = element.DROP_SHADOW
+
+    def show_emp_stats(self, element: EmployeeStatElement, emp : Employee):
+        element.hover_effect = element.SHOW_STATISTICS
+        element.update_emp_stats(emp)

@@ -69,9 +69,7 @@ class MouseController:
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == self.RIGHT_CLICK:
             for emp in self.emp_list:
                 if self.cursor.collides_with(emp.rect):
-                    self.interface_service.right_click_emp_full_stats()
-                    self.interface_service.emp_stat_full_element.update_emp_full_stats(emp)
-
+                    self.interface_service.emp_stat_full_element.click_actor(emp)
         self.hover_event()
 
     def hover_event(self):
@@ -80,9 +78,10 @@ class MouseController:
             if self.cursor.collides_with(element.rect):
                 element.hover(element)
         self.interface_service.emp_stat_element.hover_effect = self.interface_service.emp_stat_element.NO_EFFECT
-        for emp in self.emp_list:
-            if emp.is_collide_with_mouse():
-                self.interface_service.emp_stat_element.update_emp_stats(emp)
+        if self.interface_service.view_type == self.interface_service.NO_TYPE:
+            for emp in self.emp_list:
+                if emp.is_collide_with_mouse():
+                    self.interface_service.emp_stat_element.hover_actor(self.interface_service.emp_stat_element, emp)
 
     def grab_employee_event(self, event):
         for i in range(0, len(self.employee_service.employee_list)):
