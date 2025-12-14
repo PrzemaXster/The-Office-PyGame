@@ -5,7 +5,7 @@ from model.Company import Company
 from model.Interface.InterfaceElement import InterfaceElement
 
 
-class StatisticsElement(InterfaceElement):
+class CompanyStatisticsElement(InterfaceElement):
     def __init__(self, rect, img, company: Company):
         super().__init__(rect, img)
         self._company = company

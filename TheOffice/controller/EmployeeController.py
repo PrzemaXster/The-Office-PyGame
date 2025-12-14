@@ -4,6 +4,7 @@ import random
 import pygame
 
 from model.Company import Company
+from model.Employee.Employee import Employee
 from service.EmployeeServices.EmployeeManagement.AnimationService import AnimationService
 from service.EmployeeServices.EmployeeManagement.EmployeeManagementService import EmployeeManagementService
 from service.Interface.InterfaceService import InterfaceService
@@ -36,17 +37,14 @@ class EmployeeController:
         elif self.interface_service.calendar_element.is_day_after_payday:
             self.employee_service.reset_payment_system()
 
-    def create_employee(self, x, y):
+    def create_employee(self, x, y) -> Employee:
         self.employee_service.create_employee(x, y,
                                               self.employee_names[random.randint(0, len(self.employee_names) - 1)],
                                               self.company)
+        emp = self.employee_service.employee_list[0]
+        emp.stats.hire_date = self.interface_service.calendar_element.current_date
+        return emp
 
-    def grab_employee_event(self, event):
-        for i in range(0, len(self.employee_service.employee_list)):
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                self.employee_service.pick_up_employee(i)
-            elif event.type == pygame.MOUSEBUTTONUP:
-                self.employee_service.put_down_employee(i)
 
     def drag_employee(self):
         self.employee_service.drag_emp_if_selected()
@@ -59,5 +57,7 @@ class EmployeeController:
             self.employee_service.create_specific_employee(pos[0], pos[1], self.interface_service.hired_emp.get("name")
                                                            , self.interface_service.hired_emp.get("abilities"),
                                                            self.interface_service.hired_emp.get("images_path"),
-                                                           self.interface_service.hired_emp.get("salary"), self.company)
+                                                           self.interface_service.hired_emp.get("salary"),
+                                                           self.interface_service.calendar_element.current_date,
+                                                           self.company)
             self.interface_service.hired_emp = None

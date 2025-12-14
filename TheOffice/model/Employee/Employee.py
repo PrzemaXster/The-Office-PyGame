@@ -11,18 +11,14 @@ from model.Furniture import Furniture
 
 class Employee(sprite.Sprite):
 
-    def __init__(self, x, y, name, company: Company, abilities=None, images_path=None, salary=None, interests=None):
+    def __init__(self, x, y, name, company: Company, abilities=None, images_path="../resources/employees/male/emp1/", salary=1000, hire_date=None, interests=None):
         sprite.Sprite.__init__(self)
         self.name = name
         self._abilities_tuple = abilities
         self._interests_tuple = interests
         self.images_path = images_path
-        self.images_path = "../resources/employees/male/emp1/"
-        self.salary = 1000
-        if salary is not None:
-            self.salary = salary
-        if images_path is not None:
-            self.images_path = images_path
+        self._salary = salary
+        self._hire_date = hire_date
         self.current_position = -1
         self.current_drag_position = 2
         self.is_interested_in_current_topic = None
@@ -90,7 +86,7 @@ class Employee(sprite.Sprite):
         self.shake_images = [image.load(self.images_path + img_name) for img_name in shake_img_names]
         self.mask = mask.from_surface(self.image)
         self.rect = Rect(x, y, self.image.get_width(), self.image.get_height())
-        self.vision_field = Rect(x - 50, y, 100, 5)
+        self.vision_field = Rect(x - 70, y, 140, 5)
 
     def set_desk(self, action_object: Furniture):
         self.assigned_furniture = action_object
@@ -105,7 +101,7 @@ class Employee(sprite.Sprite):
         self.image = image.load(self.images_path + "/employee.png")
 
     def init_data(self):
-        self.stats = Statistics()
+        self.stats = Statistics(self._salary, self._hire_date)
         self.needs = Needs()
         if self._abilities_tuple != None:
             self._abilities = Abilities(self._abilities_tuple[0], self._abilities_tuple[1], self._abilities_tuple[2], self._abilities_tuple[3])
@@ -120,11 +116,11 @@ class Employee(sprite.Sprite):
         self.destination_mem = None
         self.coord = (0, 0)  # x - room, y - floor
         self.got_paid = False
-        self.in_conversation = False
+        self.in_interaction = False
         self.relations = {}
 
     def get_paid(self):
-        self._company_delegate.money -= self.salary
+        self._company_delegate.money -= self._salary
         self.got_paid = True
 
     def make_sale(self):

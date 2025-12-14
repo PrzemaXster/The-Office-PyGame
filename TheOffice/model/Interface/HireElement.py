@@ -65,6 +65,8 @@ class HireElement(InterfaceElement):
         if random.randint(0, 1) == self.MALE:
             self._emp_list.append(
                 {"name": self._emp_names_male[random.randint(0, len(self._emp_names_male) - 1)],
+                 "abilities": (random.randint(5, 10), random.randint(3, 7), random.randint(4, 15),
+                               random.randint(4, 6)),
                  "images_path": self._emp_images_male[random.randint(0, len(self._emp_images_male) - 1)],
                  "salary": random.randint(3000, 4000)})
         else:

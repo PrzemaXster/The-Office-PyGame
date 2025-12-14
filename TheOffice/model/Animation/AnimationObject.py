@@ -18,3 +18,6 @@ class AnimationObject:
     def trigger(self):
         self.animation_event_listener.add_new_anim(self)
         self.start_time = time.get_ticks()
+
+    def stop(self):
+        self.animation_event_listener.notify_anim_end(self)

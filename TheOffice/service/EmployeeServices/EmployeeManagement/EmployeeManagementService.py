@@ -1,4 +1,5 @@
 import random
+from datetime import date
 
 from pygame import time, mouse
 
@@ -62,7 +63,8 @@ class EmployeeManagementService:
                 self.task_service_t.pop_emp(emp, "bladder")
                 self.dest_service.search_for_room(emp, "OfficeRoom")
         # movement logic towards destination
-        if emp.destination is not None and not emp.is_collide_with_mouse() and self.ground.is_touching_adjusted(emp) and not emp.block_move:
+        if emp.destination is not None and not emp.is_collide_with_mouse() and self.ground.is_touching_adjusted(
+                emp) and not emp.block_move:
             if emp.is_sitting_down():
                 emp.remove_from_desk()
             self.move_emp_towards_destination(emp)
@@ -72,7 +74,8 @@ class EmployeeManagementService:
                 if destination is None:
                     self.collision_service.update_action_object_status(emp.destination)
                     self.collision_service.adjust_emp_to_action_object(emp, emp.destination, emp.destination.room,
-                                                                       emp.destination.room.action_objects.index(emp.destination))
+                                                                       emp.destination.room.action_objects.index(
+                                                                           emp.destination))
                     emp.set_desk(emp.destination)
                 self.dest_service.change_destination(emp, destination)
 
@@ -81,8 +84,9 @@ class EmployeeManagementService:
         self.employee_list.append(emp)
         self.needs_service_t.insert_emp(emp)
 
-    def create_specific_employee(self, x, y, name: str, abilities: tuple, images_path:str, salary: int, company: Company):
-        emp = Employee(x, y, name, company, abilities, images_path, salary)
+    def create_specific_employee(self, x, y, name: str, abilities: tuple, images_path: str, salary: int,
+                                 hire_date: date, company: Company):
+        emp = Employee(x, y, name, company, abilities, images_path, salary, hire_date)
         self.employee_list.append(emp)
         self.needs_service_t.insert_emp(emp)
 
@@ -139,8 +143,9 @@ class EmployeeManagementService:
             self.employee_list[self.dragged_emp_i].rect.centery = mouse.get_pos()[1]
 
     def employee_is_shaken(self):
-        return self.dragged_emp_x_queue[self.SECOND] + 10 < self.dragged_emp_x_queue[self.LAST] and self.dragged_emp_x_queue[self.FIRST] > \
-               self.dragged_emp_x_queue[self.THIRD] + 10
+        return self.dragged_emp_x_queue[self.SECOND] + 10 < self.dragged_emp_x_queue[self.LAST] and \
+            self.dragged_emp_x_queue[self.FIRST] > \
+            self.dragged_emp_x_queue[self.THIRD] + 10
 
     def pick_up_employee(self, index):
         if self.employee_list[index].rect.collidepoint(mouse.get_pos()):
@@ -153,8 +158,8 @@ class EmployeeManagementService:
             self.collision_service.handle_emp_desk_collide(self.employee_list[self.dragged_emp_i])
         self.dragged_emp_i = -1
 
-    def move_emp_towards_destination(self, emp :Employee):
-        x=0
+    def move_emp_towards_destination(self, emp: Employee):
+        x = 0
         emp.direction = ''
         if emp.destination.rect.x > emp.rect.x + 4:
             x = emp._abilities.speed
@@ -193,5 +198,3 @@ class EmployeeManagementService:
         if self.employee_list[0].got_paid:
             for employee in self.employee_list:
                 employee.got_paid = False
-
-
