@@ -4,6 +4,7 @@ import random
 import pygame
 
 from model.Company import Company
+from model.Employee.Employee import Employee
 from service.EmployeeServices.EmployeeManagement.AnimationService import AnimationService
 from service.EmployeeServices.EmployeeManagement.EmployeeManagementService import EmployeeManagementService
 from service.Interface.InterfaceService import InterfaceService
@@ -36,12 +37,13 @@ class EmployeeController:
         elif self.interface_service.calendar_element.is_day_after_payday:
             self.employee_service.reset_payment_system()
 
-    def create_employee(self, x, y):
+    def create_employee(self, x, y) -> Employee:
         self.employee_service.create_employee(x, y,
                                               self.employee_names[random.randint(0, len(self.employee_names) - 1)],
                                               self.company)
         emp = self.employee_service.employee_list[0]
         emp.stats.hire_date = self.interface_service.calendar_element.current_date
+        return emp
 
 
     def drag_employee(self):

@@ -11,13 +11,12 @@ from model.Furniture import Furniture
 
 class Employee(sprite.Sprite):
 
-    def __init__(self, x, y, name, company: Company, abilities=None, images_path=None, salary=1000, hire_date=None, interests=None):
+    def __init__(self, x, y, name, company: Company, abilities=None, images_path="../resources/employees/male/emp1/", salary=1000, hire_date=None, interests=None):
         sprite.Sprite.__init__(self)
         self.name = name
         self._abilities_tuple = abilities
         self._interests_tuple = interests
         self.images_path = images_path
-        self.images_path = "../resources/employees/male/emp1/"
         self._salary = salary
         self._hire_date = hire_date
         self.current_position = -1

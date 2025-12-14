@@ -13,10 +13,12 @@ class ConversationService:
         self.LETS_TALK = 4
         self.conversation_pairs = []
         self.argument_pairs = []
+        self.fight_pairs = []
         self.FIRST_SPEAK = 1500
         self.SECOND_SPEAK = 3000
         self.END_SPEAK = 8000
         self.ARGUE_LEVEL = - 15
+        self.FIGHT_LEVEL = - 30
         self.conversation_result_list = []
         self.animation_box = animation_box
 
@@ -33,7 +35,9 @@ class ConversationService:
                         if not emp.has_relation_with(emp2):
                             emp.relations.update({emp2: 0})
                             emp2.relations.update({emp: 0})
-                        if emp.relations.get(emp2) <= self.ARGUE_LEVEL:
+                        if emp.relations.get(emp2) <= self.FIGHT_LEVEL:
+                            self.initiate_fight(emp, emp2)
+                        elif emp.relations.get(emp2) <= self.ARGUE_LEVEL:
                             self.initiate_argument(emp, emp2)
                         else:
                             self.initiate_conversation(emp, emp2)
@@ -84,9 +88,25 @@ class ConversationService:
                     self.update_emp_relationships(pair, pair.relation_penalty)
                     self.argument_pairs.remove(pair)
 
+    def make_emps_fight(self):
+        for pair in self.fight_pairs[:]:
+            if self.check_convo_phase(pair.fight_timestamp, self.FIRST_SPEAK):
+                pair.trigger_fight_animation_once()
+                pair.attach_fight_cloud_to_emp()
+            else:
+                pair.finish_fight()
+                pair.unblock_movement()
+                if not self.check_convo_phase(pair.fight_timestamp, self.END_SPEAK):
+                    pair.emp1.in_interaction = False
+                    pair.emp2.in_interaction = False
+                    pair.emp1.needs.decrease_stress()
+                    pair.emp1.needs.decrease_motivation()
+                    pair.emp2.needs.decrease_stress()
+                    pair.emp2.needs.decrease_motivation()
+                    self.update_emp_relationships(pair, pair.relation_penalty)
+                    self.fight_pairs.remove(pair)
+
         # stop conversation animations
-
-
 
     def emps_are_passing_by(self, emp, emp2):
         return (emp.is_emp_in_vision(emp2)
@@ -107,7 +127,6 @@ class ConversationService:
         pair.emp1.relations.update({pair.emp2: pair.emp1.relations.get(pair.emp2) + result})
         pair.emp2.relations.update({pair.emp1: pair.emp2.relations.get(pair.emp1) + result})
 
-
     def initiate_argument(self, emp, emp2):
         emp.in_interaction = True
         emp2.in_interaction = True
@@ -115,6 +134,12 @@ class ConversationService:
         emp2.block_move = True
         self.argument_pairs.append(ArgumentPair(emp, emp2, self.animation_box))
 
+    def initiate_fight(self, emp, emp2):
+        emp.in_interaction = True
+        emp2.in_interaction = True
+        emp.block_move = True
+        emp2.block_move = True
+        self.fight_pairs.append(FightPair(emp, emp2, self.animation_box))
 
 # This class holds memonry of:
 # - employees taking part of convo
@@ -220,11 +245,13 @@ class ConversationPair:
         self.emp2.block_move = False
 
 
+# This pair will always produce negative relation of value self.relation_penalty
+# An argument bubble appears during the argument
 class ArgumentPair:
     def __init__(self, emp1: Employee, emp2: Employee, animation_box):
         self.emp1 = emp1
         self.emp2 = emp2
-        self.relation_penalty = -5
+        self.relation_penalty = -3
         self.argument_timestamp = time.get_ticks()
         self.start_argument_bubble_triggered = False
         self.response_argument_bubble_triggered = False
@@ -255,3 +282,40 @@ class ArgumentPair:
     def unblock_movement(self):
         self.emp1.block_move = False
         self.emp2.block_move = False
+
+
+class FightPair:
+    def __init__(self, emp1: Employee, emp2: Employee, animation_box):
+        self.emp1 = emp1
+        self.emp2 = emp2
+        self.emp1_image = self.emp1.image
+        self.emp2_image = self.emp2.image
+        self.relation_penalty = -5
+        self.fight_timestamp = time.get_ticks()
+        self.fight_animation_triggered = False
+        self.fight_animation = animation_box.get("fight_cloud")
+
+    def trigger_fight_animation_once(self):
+        if not self.fight_animation_triggered:
+            self.fight_animation.trigger()
+            self.fight_animation_triggered = True
+            self.emp1_image = self.emp1.image
+            self.emp2_image = self.emp2.image
+
+    def attach_fight_cloud_to_emp(self):
+        self.fight_animation.rect.x = (self.emp1.rect.x + self.emp2.rect.x) / 2
+        self.fight_animation.rect.y = self.emp1.rect.y + 10
+        self.emp1.sitting_sprite_disappear()
+        self.emp2.sitting_sprite_disappear()
+
+
+    def finish_fight(self):
+        if self.fight_animation_triggered:
+            self.fight_animation_triggered = False
+            self.emp1.image = self.emp1_image
+            self.emp2.image = self.emp2_image
+
+    def unblock_movement(self):
+        self.emp1.block_move = False
+        self.emp2.block_move = False
+

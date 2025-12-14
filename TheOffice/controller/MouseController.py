@@ -70,6 +70,7 @@ class MouseController:
             for emp in self.emp_list:
                 if self.cursor.collides_with(emp.rect):
                     self.interface_service.emp_stat_full_element.click_actor(emp)
+                    self.interface_service.relationship_stat_element.update_emp_relationships(emp,10, 0)
         self.hover_event()
 
     def hover_event(self):

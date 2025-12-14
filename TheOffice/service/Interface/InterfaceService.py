@@ -10,6 +10,7 @@ from model.Interface.EmployeeStatElement import EmployeeStatElement
 from model.Interface.EmployeeStatFullElement import EmployeeStatFullElement
 from model.Interface.HireElement import HireElement
 from model.Interface.InterfaceElement import InterfaceElement
+from model.Interface.RelationshipStatElement import RelationshipStatElement
 from model.Interface.StaticElement import StaticElement
 from model.Interface.CompanyStatisticsElement import CompanyStatisticsElement
 from service.RoomType import RoomType
@@ -28,6 +29,7 @@ class InterfaceService:
                                                            image.load("../resources/interface/elements/statistics/game_stats.png"), company)
         self.emp_stat_element = EmployeeStatElement(Rect(0, 0, 0, 0), None, on_hover=self.show_emp_stats)
         self.emp_stat_full_element = EmployeeStatFullElement(Rect(250, 170, 283, 192), None, company, self.right_click_emp_full_stats)
+        self.relationship_stat_element = RelationshipStatElement(Rect(250, 170, 283, 192), None)
 
         self.arrow_right_element = InterfaceElement(Rect(570, 170, 100, 170), image.load("../resources/interface/elements/right.png"),
                                                     self.switch_view_right, self.drop_shadow)
@@ -57,6 +59,7 @@ class InterfaceService:
         self.CALENDAR = 4
         self.STATISTICS = 5
         self.EMP_FULL_STATS = 6
+        self.RELATIONSHIP_STATS = 7
         self.view_type = self.NO_TYPE
         self.purchased_room = RoomType.NONE
         self.hired_emp = None
@@ -86,6 +89,9 @@ class InterfaceService:
             self.building_element.next_room()
         elif self.view_type == self.CALENDAR:
             self.calendar_element.next_page()
+        elif self.view_type == self.EMP_FULL_STATS:
+            self.view_type = self.RELATIONSHIP_STATS
+
 
     def switch_view_left(self):
         if self.view_type == self.HIRE_EMPLOYEE:
@@ -96,6 +102,8 @@ class InterfaceService:
             self.building_element.previous_room()
         elif self.view_type == self.CALENDAR:
             self.calendar_element.previous_page()
+        elif self.view_type == self.RELATIONSHIP_STATS:
+            self.view_type = self.EMP_FULL_STATS
 
     def click_accept(self):
         if self.view_type == self.PURCHASE_ROOM:

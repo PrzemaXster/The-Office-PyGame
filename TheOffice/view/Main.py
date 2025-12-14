@@ -1,5 +1,3 @@
-from os import listdir
-
 import pygame
 from pygame import Rect
 
@@ -12,18 +10,17 @@ from model.Animation.AnimationEventListener import AnimationEventListener
 from model.Animation.AnimationObject import AnimationObject
 from model.Company import Company
 from model.Ground import Ground
-from model.Interface.StaticElement import StaticElement
 from service.EmployeeServices.EmployeeManagement.AnimationService import AnimationService
 from service.EmployeeServices.EmployeeManagement.ConversationService import ConversationService
 from service.Interface.InterfaceService import InterfaceService
 from service.RoomType import RoomType
+from view.Draw.Drawing import Drawing
 
 
 class Game:
     def __init__(self):
         pygame.init()
         self.init_screen()
-        self.init_texts()
         self.init_objects()
         self.main_loop()
 
@@ -40,8 +37,7 @@ class Game:
             self.screen.fill((155, 232, 255))
             self.employee_controller.drag_employee()
             self.employee_controller.manage_salaries()
-            self.update_text()
-            # self.mouse_controller.scroll_view()
+            self.drawing.update_text()
             self.keyboard_controller.scroll_view()
             self.mouse_controller.move_cursor()
             self.employee_controller.move_employees()
@@ -49,9 +45,10 @@ class Game:
             self.animation_service.animate_objects()
             self.conversation_service.make_emps_converse()
             self.conversation_service.make_emps_argue()
+            self.conversation_service.make_emps_fight()
             self.conversation_service.manage_emps_conversations()
             self.interface_service.update_time()
-            self.draw()
+            self.drawing.draw()
             self.clock.tick(30)
             pygame.display.flip()
 
@@ -79,121 +76,6 @@ class Game:
                                                (255, 255, 255))  # could be shown by levels: low, medium, high
         elif self.interface_service.view_type == self.interface_service.STATISTICS:
             self.interface_service.statistics_element.update_text()
-
-    def draw(self):
-        for floor in range(0, len(self.building_controller.get_room_board())):
-            for room in self.building_controller.get_room_board()[floor]:
-                self.screen.blit(room.image, room.rect)
-                # for action_obj in room.action_objects:
-                #     pygame.draw.rect(self.screen, (0, 0, 0), action_obj.rect)
-        if self.mouse_controller.cursor.drags_room():
-            self.screen.blit(self.mouse_controller.cursor.image, self.mouse_controller.cursor.rect.move(-150, -150))
-        for emp in self.employee_controller.employee_service.employee_list:
-            self.screen.blit(emp.image, emp.rect)
-
-        self.draw_interface()
-
-        for animation in self.animation_service.anim_object_list:
-            self.screen.blit(animation.current_sprite, animation.rect)
-
-        pygame.draw.line(self.screen, (0, 0, 0), (397, 55), self.interface_service.clock_element.clk_pointer, 5)
-        # self.screen.blit(self.hunger, self.text_rect.move(0, 125))
-        # self.screen.blit(self.stress, self.text_rect.move(0, 100))
-        # self.screen.blit(self.motivation, self.text_rect.move(0, 150))
-
-    def draw_interface(self):
-        # draw all elements of interface
-        for element in self.interface_service.element_list:
-            # icons should always be displayed and elements should only be displayed if user clicked on icon
-            if issubclass(element.__class__,
-                          StaticElement) or self.interface_service.view_type != self.interface_service.NO_TYPE:
-                # draw hover effect
-                if element.hover_effect == element.DROP_SHADOW:
-                    self.screen.blit(element.hover_surface, element.rect)
-                self.screen.blit(element.image, element.rect)
-
-        if self.interface_service.emp_stat_element.hover_effect == self.interface_service.emp_stat_element.SHOW_STATISTICS:
-            self.screen.blit(self.interface_service.emp_stat_element.background_surface,
-                             self.interface_service.emp_stat_element.rect)
-            self.screen.blit(self.interface_service.emp_stat_element.name_text,
-                             self.interface_service.emp_stat_element.rect.move(10, 10))
-            self.screen.blit(self.interface_service.emp_stat_element.hunger_text,
-                             self.interface_service.emp_stat_element.rect.move(10, 30))
-            self.screen.blit(self.interface_service.emp_stat_element.stress_text,
-                             self.interface_service.emp_stat_element.rect.move(10, 50))
-            self.screen.blit(self.interface_service.emp_stat_element.motivation_text,
-                             self.interface_service.emp_stat_element.rect.move(10, 70))
-
-            self.screen.blit(self.interface_service.emp_stat_element.emp_name_text,
-                             self.interface_service.emp_stat_element.rect.move(110, 10))
-            self.screen.blit(self.interface_service.emp_stat_element.hunger_bar,
-                             self.interface_service.emp_stat_element.rect.move(110, 35))
-            self.screen.blit(self.interface_service.emp_stat_element.stress_bar,
-                             self.interface_service.emp_stat_element.rect.move(110, 55))
-            self.screen.blit(self.interface_service.emp_stat_element.motivation_bar,
-                             self.interface_service.emp_stat_element.rect.move(110, 75))
-            self.screen.blit(self.interface_service.emp_stat_element.bladder_text,
-                             self.interface_service.emp_stat_element.rect.move(10, 90))
-            self.screen.blit(self.interface_service.emp_stat_element.bladder_bar,
-                             self.interface_service.emp_stat_element.rect.move(110, 90))
-            self.screen.blit(self.interface_service.emp_stat_element.sales_number_text,
-                             self.interface_service.emp_stat_element.rect.move(120, 110))
-            self.screen.blit(self.interface_service.emp_stat_element.sales_text,
-                             self.interface_service.emp_stat_element.rect.move(10, 110))
-
-        # draw different views based on which icon user clicked
-        if self.interface_service.view_type == self.interface_service.HIRE_EMPLOYEE:
-            self.screen.blit(self.interface_service.hire_element.background_surface,
-                             self.interface_service.hire_element.rect.move(-20, -20))
-            if self.interface_service.hire_element.candidates_are_present():
-                self.screen.blit(self.interface_service.hire_element.get_current_emp_image(),
-                                 self.interface_service.hire_element.rect)
-                self.screen.blit(self.emp_name, self.interface_service.hire_element.rect.move(70, 0))
-                self.screen.blit(self.stomach, self.interface_service.hire_element.rect.move(70, 30))
-                self.screen.blit(self.anxiety, self.interface_service.hire_element.rect.move(70, 60))
-                self.screen.blit(self.boredom, self.interface_service.hire_element.rect.move(70, 90))
-                self.screen.blit(self.salary, self.interface_service.hire_element.rect.move(70, 120))
-                self.screen.blit(self.interface_service.hire_element.get_capital_text(),
-                                 self.interface_service.hire_element.capital_rect)
-        elif self.interface_service.view_type == self.interface_service.STATISTICS:
-            self.screen.blit(self.interface_service.statistics_element.get_stat_image(),
-                             self.interface_service.statistics_element.rect)
-            if self.interface_service.statistics_element.is_game_stats():
-                for i in range(0, len(self.interface_service.statistics_element.game_stat_list)):
-                    self.screen.blit(self.interface_service.statistics_element.game_stat_list[i],
-                                     self.interface_service.statistics_element.game_stat_rect.move(0, 30 * i))
-        elif self.interface_service.view_type == self.interface_service.PURCHASE_ROOM:
-            self.screen.blit(self.interface_service.building_element.background_surface,
-                             self.interface_service.building_element.rect.move(-20, -10))
-            self.screen.blit(self.interface_service.building_element.cost_number_text,
-                             self.interface_service.building_element.cost_rect)
-            self.screen.blit(self.interface_service.building_element.get_room_image(),
-                             self.interface_service.building_element.rect)
-            self.screen.blit(self.interface_service.building_element.get_capital_text(),
-                             self.interface_service.building_element.capital_rect)
-        elif self.interface_service.view_type == self.interface_service.CALENDAR:
-            self.screen.blit(self.interface_service.calendar_element.image,
-                             self.interface_service.calendar_element.rect)
-            self.screen.blit(self.interface_service.calendar_element.get_current_page_image(),
-                             self.interface_service.calendar_element.page_rect)
-            self.screen.blit(self.interface_service.calendar_element.text_background,
-                             self.interface_service.calendar_element.month_text_rect.move(-5, -5))
-            self.screen.blit(self.interface_service.calendar_element.get_month_text(),
-                             self.interface_service.calendar_element.month_text_rect)
-            if self.interface_service.calendar_element.at_current_page():
-                pygame.draw.rect(self.screen, (255, 0, 0), self.interface_service.calendar_element.page_marker_rect, 3)
-        elif self.interface_service.view_type == self.interface_service.EMP_FULL_STATS:
-            self.screen.blit(self.interface_service.emp_stat_full_element.background_surface,
-                             self.interface_service.emp_stat_full_element.rect)
-            self.screen.blit(self.interface_service.emp_stat_full_element.title_text,
-                             self.interface_service.emp_stat_full_element.stat_rect)
-            self.screen.blit(self.interface_service.emp_stat_full_element.salary_text,
-                             self.interface_service.emp_stat_full_element.stat_rect.move(-10, 30))
-            self.screen.blit(self.interface_service.emp_stat_full_element.hire_date,
-                             self.interface_service.emp_stat_full_element.stat_rect.move(-10, 60))
-            self.screen.blit(self.interface_service.emp_stat_full_element.papers_sold_text,
-                             self.interface_service.emp_stat_full_element.stat_rect.move(-10, 90))
-            self.screen.blit(self.interface_service.emp_stat_full_element.emp_name_text, self.interface_service.emp_stat_full_element.visual_rect)
 
     def init_objects(self):
         self.ground = Ground(self.screen)
@@ -235,6 +117,7 @@ class Game:
         # self.employee_controller.employee_service.employee_list[0].needs.hunger = 20
         # self.employee_controller.employee_service.employee_list[0].needs.stress = 20
         self.employee_controller.employee_service.employee_list[0].needs.bladder = 10
+        self.drawing = Drawing(self.screen, self.building_controller, self.mouse_controller, self.employee_controller, self.animation_service, self.interface_service)
 
     def init_animations(self):
         self.animation_box = {}
@@ -262,12 +145,21 @@ class Game:
             pygame.image.load("../resources/animations/argument_bubbles/argue_3.png")
         ], self.animation_event_listener, 125, 1500)
 
+        self.fight_cloud = AnimationObject(Rect(30, 30, 70, 100), [
+            pygame.image.load("../resources/animations/fight_cloud/fight_cloud_1.png"),
+            pygame.image.load("../resources/animations/fight_cloud/fight_cloud_2.png"),
+            pygame.image.load("../resources/animations/fight_cloud/fight_cloud_3.png"),
+        ], self.animation_event_listener, 125, 1500)
+
         self.animation_box.update({
             "speech_bubbles": [self.speech_bubble_disagree, self.speech_bubble_laugh, self.speech_bubble_technology,
                                self.speech_bubble_sport],
         })
         self.animation_box.update({
             "argument_bubble": self.argue_bubble,
+        })
+        self.animation_box.update({
+            "fight_cloud": self.fight_cloud
         })
         hover_circle_animation_list = []
         for floor in self.building_controller.get_room_board():
@@ -291,10 +183,6 @@ class Game:
         self.animation_box.update({"hover_circle_default": self.hover_circle_default})
         self.animation_box.update({"hover_circle_active": self.hover_circle_active})
         self.animation_box.get("hover_circle_active")
-
-    def init_texts(self):
-        self.font = pygame.font.SysFont("Calibri", 24, True)
-        self.text_rect = pygame.Rect(0, 0, 1, 1)
 
     def init_screen(self):
         pygame.display.init()
